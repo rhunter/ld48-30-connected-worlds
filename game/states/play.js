@@ -3,17 +3,17 @@
   function Play() {}
   Play.prototype = {
     create: function() {
-      this.game.physics.startSystem(Phaser.Physics.ARCADE);
-      this.sprite = this.game.add.sprite(this.game.width/2, this.game.height/2, 'yeoman');
-      this.sprite.inputEnabled = true;
+      this.map = this.game.add.tilemap('mytilemap');
+      this.map.addTilesetImage('ImageSlotInMap', 'mytileimage');
+      this.mapLayer = this.map.createLayer('Ground');
+      this.mapLayer.resizeWorld();
+      this.game.world.scale.setTo(4, 4);
 
-      this.game.physics.arcade.enable(this.sprite);
-      this.sprite.body.collideWorldBounds = true;
-      this.sprite.body.bounce.setTo(1,1);
-      this.sprite.events.onInputDown.add(this.clickListener, this);
     },
     update: function() {
-
+      if (this.game.input.mousePointer.isDown) {
+        this.clickListener();
+      }
     },
     clickListener: function() {
       this.game.state.start('gameover');

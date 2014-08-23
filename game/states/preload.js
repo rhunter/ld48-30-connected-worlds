@@ -12,7 +12,8 @@ Preload.prototype = {
 
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
-    this.load.image('logo', 'assets/yeoman-logo.png');
+    this.load.tilemap('mytilemap', 'assets/worldmap.json', null, Phaser.Tilemap.TILED_JSON);
+    this.load.image('mytileimage', 'assets/grassy.png');
 
   },
   create: function() {
