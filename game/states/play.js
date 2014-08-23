@@ -7,16 +7,21 @@
       this.map.addTilesetImage('ImageSlotInMap', 'mytileimage');
       this.mapLayer = this.map.createLayer('Ground');
       this.mapLayer.resizeWorld();
-      this.game.world.scale.setTo(4, 4);
-
+      this.desireCloseness = true;
+      this.showCloseness();
     },
     update: function() {
       if (this.game.input.mousePointer.isDown) {
         this.clickListener();
       }
+      this.showCloseness();
     },
     clickListener: function() {
-      this.game.state.start('gameover');
+      this.desireCloseness = !this.desireCloseness;
+    },
+    showCloseness: function() {
+      var multiplier = this.desireCloseness ? 4 : 1;
+      this.game.world.scale.setTo(multiplier, multiplier);
     }
   };
 
