@@ -9,9 +9,11 @@
     // this.timeSinceLastMateSeen = 0;
     // this.desiredLocation = new Phaser.Point();
       this.game.physics.arcade.enable(this);
+      this.anchor.setTo(0.5, 1.0);
       this.health = 100;
       this.body.collideWorldBounds = true;
       this.body.bounce.set(1.0);
+
       this.game.time.events.add(Phaser.Timer.SECOND * this.game.rnd.between(3,8), this.turn, this);
   }
   WanderingDude.prototype = Object.create(Phaser.Sprite.prototype);
@@ -70,12 +72,15 @@
       this.buildingsGroup = this.game.add.group(this.playfield);
       this.buildingsGroup.z = 2;
       this.dudeHouse = this.game.add.sprite(200, 240, 'hut1');
+      this.dudeHouse.anchor.setTo(0.5, 0.7)
       this.dudeHouse.inputEnabled = true;
       this.dudeHouse.events.onInputDown.add(this.onSpawnButton, this);
 
       this.broHouse = this.game.add.sprite(700, 400, 'hut2');
+      this.broHouse.anchor.setTo(0.5, 0.5)
       this.broHouse.inputEnabled = true;
       this.broHouse.events.onInputDown.add(this.spawnEnemy, this);
+
       this.buildingsGroup.add(this.broHouse);
       this.buildingsGroup.add(this.dudeHouse);
 
@@ -90,9 +95,9 @@
       this.uiZoomButton = this.game.add.button(100,5,'zoombutton',this.onZoomButton, this);
       this.uiGroup.add(this.uiZoomButton);
       var counterStyle = {font: '20px Arial', fill: '#d0d0d0', stroke: '#303030', strokeThickness: 4, align: 'left'};
-      this.uiDudeCountLabel = this.game.add.text(this.dudeHouse.x,this.dudeHouse.y, '', counterStyle);
+      this.uiDudeCountLabel = this.game.add.text(this.dudeHouse.x,this.dudeHouse.y - 65, '', counterStyle);
       this.uiDudeCountLabel.anchor.setTo(0.5, 0.5)
-      this.uiBroCountLabel = this.game.add.text(this.broHouse.x,this.broHouse.y, '', counterStyle);
+      this.uiBroCountLabel = this.game.add.text(this.broHouse.x,this.broHouse.y - 35, '', counterStyle);
       this.uiBroCountLabel.anchor.setTo(0.5, 0.5)
 
 
@@ -183,7 +188,7 @@
       }
       this.numberOfAvailableDudes--;
       var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1});
-      dude.body.velocity.x = -25;
+      dude.body.velocity.setTo(25, 25);
       this.dudesGroup.add(dude);
       this.buttonSound.play();
     },
@@ -215,7 +220,7 @@
       this.numberOfAvailableBros--;
       var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2});
       this.game.physics.arcade.enable(sprite);
-      sprite.body.velocity.y = -25;
+      sprite.body.velocity.setTo(-25, 25);
       sprite.events.onKilled.add(this.onDudeKilled, this);
       this.brosGroup.add(sprite);
       this.buttonSound.play();
