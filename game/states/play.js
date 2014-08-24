@@ -87,11 +87,22 @@
       this.uiGroup.add(this.uiBroCountLabel)
 
       this.game.physics.startSystem(Phaser.Physics.ARCADE);
+
+      this.dyingSounds = [
+        this.game.add.sound('cry1'),
+        this.game.add.sound('cry2'),
+        this.game.add.sound('cry3'),
+        this.game.add.sound('cry4'),
+        this.game.add.sound('cry5'),
+        this.game.add.sound('cry6'),
+        this.game.add.sound('cry7'),
+        this.game.add.sound('cry8'),
+        this.game.add.sound('cry9'),
+        this.game.add.sound('cry10')
+      ];
     },
     update: function() {
-      this.game.physics.arcade.collide(this.dudesGroup, this.sectorBorders);
-      this.game.physics.arcade.collide(this.brosGroup, this.sectorBorders);
-      this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup);
+      this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup, this.onFolksMeet, null, this);
       this.showCloseness();
       this.showNumbers();
     },
@@ -101,17 +112,26 @@
     onZoomButton: function() {
       this.desireCloseness = !this.desireCloseness;
     },
+    onFolksMeet: function(dude, bro) {
+      dude.damage(20);
+      bro.damage(30);
+    },
     onSpawnButton: function() {
       this.numberOfDudes++;
       var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1});
       dude.body.velocity.x = -25;
       this.dudesGroup.add(dude);
     },
+    onDudeKilled: function(evt) {
+      var sound = this.game.rnd.pick(this.dyingSounds);
+      sound.play();
+    },
     spawnEnemy: function() {
       this.numberOfBros++;
       var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2});
       this.game.physics.arcade.enable(sprite);
       sprite.body.velocity.y = -25;
+      sprite.events.onKilled.add(this.onDudeKilled, this);
       this.brosGroup.add(sprite);
     },
     showNumbers: function() {

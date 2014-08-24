@@ -21,6 +21,16 @@ Preload.prototype = {
     this.load.image('hut1', 'assets/hut1.png');
     this.load.image('hut2', 'assets/hut2.png');
     this.load.image('zoombutton', 'assets/zoombutton.png');
+    this.load.audio('cry1', 'assets/cry-01.wav');
+    this.load.audio('cry2', 'assets/cry-02.wav');
+    this.load.audio('cry3', 'assets/cry-03.wav');
+    this.load.audio('cry4', 'assets/cry-04.wav');
+    this.load.audio('cry5', 'assets/cry-05.wav');
+    this.load.audio('cry6', 'assets/cry-06.wav');
+    this.load.audio('cry7', 'assets/cry-07.wav');
+    this.load.audio('cry8', 'assets/cry-08.wav');
+    this.load.audio('cry9', 'assets/cry-09.wav');
+    this.load.audio('cry10', 'assets/cry-10.wav');
   },
   create: function() {
     this.asset.cropEnabled = false;
