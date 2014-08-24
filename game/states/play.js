@@ -52,12 +52,17 @@
 
       this.desireCloseness = true;
       this.numberOfDudes = 0;
+      this.numberOfBros = 0;
 
       this.buildingsGroup = this.game.add.group(this.playfield);
       this.buildingsGroup.z = 2;
       this.dudeHouse = this.game.add.sprite(200, 240, 'hut1');
-      // todo: make clicking the house do a spawn
+      this.dudeHouse.inputEnabled = true;
+      this.dudeHouse.events.onInputDown.add(this.onSpawnButton, this);
+
       this.broHouse = this.game.add.sprite(700, 400, 'hut2');
+      this.broHouse.inputEnabled = true;
+      this.broHouse.events.onInputDown.add(this.spawnEnemy, this);
       this.buildingsGroup.add(this.broHouse);
       this.buildingsGroup.add(this.dudeHouse);
 
@@ -70,17 +75,18 @@
       this.uiGroup.z = 10;
       this.uiGroup.fixedToCamera = true;
       this.uiZoomButton = this.game.add.button(100,5,'zoombutton',this.onZoomButton, this);
-      this.uiDudeSpawner = this.game.add.button(5,5,'dudebutton',this.onSpawnButton, this);
       this.uiGroup.add(this.uiZoomButton);
-      this.uiGroup.add(this.uiDudeSpawner);
       var counterStyle = {font: '20px Arial', fill: '#d0d0d0', stroke: '#303030', strokeThickness: 4, align: 'left'};
-      this.uiDudeCountLabel = this.game.add.text(15,60, '', counterStyle);
-      // todo: place over house
+      this.uiDudeCountLabel = this.game.add.text(this.dudeHouse.x,this.dudeHouse.y, '', counterStyle);
+      this.uiDudeCountLabel.anchor.setTo(0.5, 0.5)
+      this.uiBroCountLabel = this.game.add.text(this.broHouse.x,this.broHouse.y, '', counterStyle);
+      this.uiBroCountLabel.anchor.setTo(0.5, 0.5)
+
+
       this.uiGroup.add(this.uiDudeCountLabel);
+      this.uiGroup.add(this.uiBroCountLabel)
 
       this.game.physics.startSystem(Phaser.Physics.ARCADE);
-      this.game.time.events.loop(Phaser.Timer.SECOND, this.spawnEnemy, this);
-
     },
     update: function() {
       this.game.physics.arcade.collide(this.dudesGroup, this.sectorBorders);
@@ -102,6 +108,7 @@
       this.dudesGroup.add(dude);
     },
     spawnEnemy: function() {
+      this.numberOfBros++;
       var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2});
       this.game.physics.arcade.enable(sprite);
       sprite.body.velocity.y = -25;
@@ -109,6 +116,7 @@
     },
     showNumbers: function() {
       this.uiDudeCountLabel.setText(this.numberOfDudes.toString());
+      this.uiBroCountLabel.setText(this.numberOfBros.toString());
     },
     showCloseness: function() {
       var multiplier = this.desireCloseness ? 1 : 0.25;
