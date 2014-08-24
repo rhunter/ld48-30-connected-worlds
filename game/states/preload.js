@@ -14,8 +14,11 @@ Preload.prototype = {
     this.load.setPreloadSprite(this.asset);
     this.load.tilemap('mytilemap', 'assets/worldmap.json', null, Phaser.Tilemap.TILED_JSON);
     this.load.image('mytileimage', 'assets/grassy.png');
-    this.load.image('dude1', 'assets/dude.png');
+    this.load.image('dudebutton', 'assets/dude.png');
+    this.load.image('dude1', 'assets/dude1.png');
     this.load.image('dude2', 'assets/dude2.png');
+    this.load.image('hut1', 'assets/hut1.png');
+    this.load.image('hut2', 'assets/hut2.png');
     this.load.image('zoombutton', 'assets/zoombutton.png');
   },
   create: function() {
