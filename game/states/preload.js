@@ -16,6 +16,7 @@ Preload.prototype = {
     this.load.image('mytileimage', 'assets/grassy.png');
     this.load.image('dude1', 'assets/dude.png');
     this.load.image('dude2', 'assets/dude2.png');
+    this.load.image('zoombutton', 'assets/zoombutton.png');
   },
   create: function() {
     this.asset.cropEnabled = false;

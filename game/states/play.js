@@ -12,10 +12,14 @@
       this.mapLayer.debug = true;
       this.desireCloseness = true;
       this.showCloseness();
+      this.numberOfDudes = 2;
       this.sprites = [
         this.game.add.sprite(0, 50, 'dude1'),
         this.game.add.sprite(100, 50, 'dude2'),
       ];
+
+      this.uiZoomButton = this.game.add.button(100,5,'zoombutton',this.onZoomButton, this);
+      this.uiDudeSpawner = this.game.add.button(5,5,'dude1',this.onSpawnButton, this);
       this.game.physics.startSystem(Phaser.Physics.ARCADE);
       this.game.physics.arcade.enable(this.sprites[0]);
       this.game.physics.arcade.enable(this.sprites[1]);
@@ -31,17 +35,19 @@
       this.game.physics.arcade.collide(this.sprites[0], this.mapLayer);
       this.game.physics.arcade.collide(this.sprites[1], this.mapLayer);
       this.game.physics.arcade.collide(this.sprites[0], this.sprites[1]);
-      if (this.game.input.mousePointer.isDown) {
-        this.clickListener();
-      }
+
       this.showCloseness();
     },
     render: function() {
       this.game.debug.bodyInfo(this.sprites[0], 32, 32);
-
     },
-    clickListener: function() {
+    onZoomButton: function() {
+      console.debug('zooooom');
       this.desireCloseness = !this.desireCloseness;
+    },
+    onSpawnButton: function() {
+      console.debug('spawwwwn');
+      this.numberOfDudes++;
     },
     showCloseness: function() {
       var multiplier = this.desireCloseness ? 4 : 1;
