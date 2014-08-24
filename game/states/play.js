@@ -12,7 +12,7 @@
       this.health = 100;
       this.body.collideWorldBounds = true;
       this.body.bounce.set(1.0);
-      this.game.time.events.add(Phaser.Timer.SECOND * 5, this.turn, this);
+      this.game.time.events.add(Phaser.Timer.SECOND * this.game.rnd.between(3,8), this.turn, this);
   }
   WanderingDude.prototype = Object.create(Phaser.Sprite.prototype);
   WanderingDude.prototype.constructor = WanderingDude;
@@ -100,6 +100,45 @@
         this.game.add.sound('cry9'),
         this.game.add.sound('cry10')
       ];
+      this.attackSounds = [
+        this.game.add.sound('sword1'),
+        this.game.add.sound('sword2'),
+        this.game.add.sound('sword3'),
+        this.game.add.sound('sword4'),
+        this.game.add.sound('sword5'),
+        this.game.add.sound('sword6'),
+        this.game.add.sound('sword7'),
+        this.game.add.sound('sword8'),
+        this.game.add.sound('sword9'),
+        this.game.add.sound('sword10'),
+        this.game.add.sound('sword11'),
+        this.game.add.sound('sword12'),
+        this.game.add.sound('sword13'),
+        this.game.add.sound('sword14'),
+        this.game.add.sound('sword15'),
+        this.game.add.sound('sword16'),
+        this.game.add.sound('sword17'),
+        this.game.add.sound('sword18'),
+        this.game.add.sound('sword19'),
+        this.game.add.sound('sword20'),
+        this.game.add.sound('sword21'),
+        this.game.add.sound('sword22'),
+        this.game.add.sound('sword23'),
+        this.game.add.sound('sword24'),
+        this.game.add.sound('sword25'),
+        this.game.add.sound('sword26'),
+        this.game.add.sound('sword27'),
+        this.game.add.sound('sword28'),
+      ];
+      this.buttonSound = this.game.add.sound('buttonpress');
+      this.music = this.game.add.sound('music',1,true);
+      this.music.play();
+
+
+      this.explosionEmitter = this.game.add.emitter(0,0, 100);
+      this.explosionEmitter.makeParticles('noise');
+      this.explosionEmitter.gravity = 200;
+
     },
     update: function() {
       this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup, this.onFolksMeet, null, this);
@@ -115,16 +154,23 @@
     onFolksMeet: function(dude, bro) {
       dude.damage(20);
       bro.damage(30);
+      this.game.rnd.pick(this.attackSounds).play();
+      this.game.rnd.pick(this.attackSounds).play();
     },
     onSpawnButton: function() {
       this.numberOfDudes++;
       var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1});
       dude.body.velocity.x = -25;
       this.dudesGroup.add(dude);
+      this.buttonSound.play();
     },
-    onDudeKilled: function(evt) {
+    onDudeKilled: function(dude) {
       var sound = this.game.rnd.pick(this.dyingSounds);
       sound.play();
+      console.log(arguments);
+
+      this.explosionEmitter.at(dude);
+      this.explosionEmitter.start(true, 300, null, 10)
     },
     spawnEnemy: function() {
       this.numberOfBros++;
@@ -133,6 +179,7 @@
       sprite.body.velocity.y = -25;
       sprite.events.onKilled.add(this.onDudeKilled, this);
       this.brosGroup.add(sprite);
+      this.buttonSound.play();
     },
     showNumbers: function() {
       this.uiDudeCountLabel.setText(this.numberOfDudes.toString());
