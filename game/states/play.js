@@ -3,32 +3,44 @@
   function Play() {}
   Play.prototype = {
     create: function() {
-      this.map = this.game.add.tilemap('mytilemap');
-      this.map.addTilesetImage('ImageSlotInMap', 'mytileimage');
-      this.map.setCollision([42], true);
-      //this.map.setCollisionByExclusion([0, 1]);
-      this.mapLayer = this.map.createLayer('Ground');
-      this.mapLayer.resizeWorld();
-      this.mapLayer.debug = true;
+      this.skyLayer = this.game.add.group();
+      this.skyLayer.z = 0;
+      this.skyLayer.add(this.game.add.sprite(0,0,'sky'));
+      this.playfield = this.game.add.group();
+      this.playfield.z = 1;
+      this.playfield.add(this.game.add.sprite(0,0,'land'));
+
       this.desireCloseness = true;
-      this.showCloseness();
       this.numberOfDudes = 0;
-      this.dudesGroup = this.game.add.group();
-      this.dudeHouse = this.game.add.sprite(10, 50, 'hut1');
-      this.brosGroup = this.game.add.group();
-      this.broHouse = this.game.add.sprite(100, 80, 'hut2');
 
+      this.buildingsGroup = this.game.add.group(this.playfield);
+      this.buildingsGroup.z = 2;
+      this.dudeHouse = this.game.add.sprite(200, 240, 'hut1');
+      this.broHouse = this.game.add.sprite(700, 400, 'hut2');
+      this.buildingsGroup.add(this.broHouse);
+      this.buildingsGroup.add(this.dudeHouse);
 
+      this.dudesGroup = this.game.add.group(this.playfield);
+      this.dudesGroup.z = 3;
+      this.brosGroup = this.game.add.group(this.playfield);
+      this.brosGroup.z = 4;
+
+      this.uiGroup = this.game.add.group(this.game.world, 'ui', false);
+      this.uiGroup.z = 10;
+      this.uiGroup.fixedToCamera = true;
       this.uiZoomButton = this.game.add.button(100,5,'zoombutton',this.onZoomButton, this);
       this.uiDudeSpawner = this.game.add.button(5,5,'dudebutton',this.onSpawnButton, this);
+      this.uiGroup.add(this.uiZoomButton);
+      this.uiGroup.add(this.uiDudeSpawner);
       var counterStyle = {font: '20px Arial', fill: '#d0d0d0', stroke: '#303030', strokeThickness: 4, align: 'left'};
       this.uiDudeCountLabel = this.game.add.text(15,60, '', counterStyle);
+      this.uiGroup.add(this.uiDudeCountLabel)
       this.game.physics.startSystem(Phaser.Physics.ARCADE);
       this.game.time.events.loop(Phaser.Timer.SECOND, this.spawnEnemy, this);
     },
     update: function() {
-      this.game.physics.arcade.collide(this.dudesGroup, this.mapLayer);
-      this.game.physics.arcade.collide(this.brosGroup, this.mapLayer);
+      // this.game.physics.arcade.collide(this.dudesGroup, this.mapLayer);
+      // this.game.physics.arcade.collide(this.brosGroup, this.mapLayer);
       this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup);
       this.showCloseness();
       this.showNumbers();
@@ -37,7 +49,6 @@
       // this.game.debug.bodyInfo(this.sprites[0], 32, 32);
     },
     onZoomButton: function() {
-      console.debug('zooooom');
       this.desireCloseness = !this.desireCloseness;
     },
     onSpawnButton: function() {
@@ -63,8 +74,8 @@
       this.uiDudeCountLabel.setText(this.numberOfDudes.toString());
     },
     showCloseness: function() {
-      var multiplier = this.desireCloseness ? 4 : 1;
-      this.game.world.scale.setTo(multiplier, multiplier);
+      var multiplier = this.desireCloseness ? 1 : 0.25;
+      this.playfield.scale.setTo(multiplier, multiplier);
     }
   };
 
