@@ -34,6 +34,17 @@
       this.body.velocity.y = -1 * Math.abs(this.body.velocity.y) * this.body.bounce.y;
     }
   }
+  WanderingDude.prototype.decideNextMove = function() {
+    if (Math.floor(Math.abs(this.body.velocity.x)) > 1 &&
+      Math.floor(Math.abs(this.body.velocity.y)) > 1) {
+      this.turn();
+    } else {
+      // todo actually make sure he starts walking again?
+      this.body.velocity.setTo(25,25);
+    }
+
+    this.game.time.events.add(Phaser.Timer.SECOND * this.game.rnd.between(3,8), this.decideNextMove, this);
+  };
   WanderingDude.prototype.turn = function() {
     var oldX = this.body.velocity.x;
     var oldY = this.body.velocity.y;
@@ -42,6 +53,12 @@
   }
 
   Play.prototype = {
+    init: function() {
+      this.hasPlayerAchievedVictory = false;
+      this.desireCloseness = true;
+      this.numberOfAvailableDudes = 30;
+      this.numberOfAvailableBros = 30;
+    },
     create: function() {
       this.skyLayer = this.game.add.group();
       this.skyLayer.z = 0;
@@ -49,10 +66,6 @@
       this.playfield = this.game.add.group();
       this.playfield.z = 1;
       this.playfield.add(this.game.add.sprite(0,0,'land'));
-
-      this.desireCloseness = true;
-      this.numberOfDudes = 0;
-      this.numberOfBros = 0;
 
       this.buildingsGroup = this.game.add.group(this.playfield);
       this.buildingsGroup.z = 2;
@@ -131,6 +144,7 @@
         this.game.add.sound('sword28'),
       ];
       this.buttonSound = this.game.add.sound('buttonpress');
+      this.deadButtonSound = this.game.add.sound('buttonfail');
       this.music = this.game.add.sound('music',1,true);
       this.music.play();
 
@@ -144,11 +158,16 @@
       this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup, this.onFolksMeet, null, this);
       this.showCloseness();
       this.showNumbers();
+      this.maybeWin();
+      if(this.hasPlayerAchievedVictory) {
+        this.game.time.events.add(Phaser.Timer.SECOND * 4, this.onWin, this);
+      }
     },
     render: function() {
       //this.game.debug.bodyInfo(window.myborders[0], 32, 32);
     },
     onZoomButton: function() {
+      this.hasPlayerAchievedVictory = true;
       this.desireCloseness = !this.desireCloseness;
     },
     onFolksMeet: function(dude, bro) {
@@ -158,7 +177,11 @@
       this.game.rnd.pick(this.attackSounds).play();
     },
     onSpawnButton: function() {
-      this.numberOfDudes++;
+      if (this.numberOfAvailableDudes < 1) {
+        this.deadButtonSound.play();
+        return;
+      }
+      this.numberOfAvailableDudes--;
       var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1});
       dude.body.velocity.x = -25;
       this.dudesGroup.add(dude);
@@ -172,8 +195,24 @@
       this.explosionEmitter.at(dude);
       this.explosionEmitter.start(true, 300, null, 10)
     },
+    onWin: function() {
+      var blackness = this.game.add.graphics(0,0);
+      blackness.beginFill('black');
+      blackness.drawRect(0,0,this.game.width, this.game.height);
+      blackness.alpha = 1;
+      blackness.endFill();
+      var fadingTween = this.game.add.tween(blackness).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
+      fadingTween.onComplete.add(this.advanceToWinScreen, this);
+    },
+    advanceToWinScreen: function() {
+      this.game.state.start('gameover');
+    },
     spawnEnemy: function() {
-      this.numberOfBros++;
+      if (this.numberOfAvailableBros < 1) {
+        this.deadButtonSound.play();
+        return;
+      }
+      this.numberOfAvailableBros--;
       var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2});
       this.game.physics.arcade.enable(sprite);
       sprite.body.velocity.y = -25;
@@ -182,12 +221,17 @@
       this.buttonSound.play();
     },
     showNumbers: function() {
-      this.uiDudeCountLabel.setText(this.numberOfDudes.toString());
-      this.uiBroCountLabel.setText(this.numberOfBros.toString());
+      this.uiDudeCountLabel.setText(this.numberOfAvailableDudes.toString() + '(+' + this.dudesGroup.countLiving() + ')');
+      this.uiBroCountLabel.setText(this.numberOfAvailableBros.toString() + '(+' + this.brosGroup.countLiving() + ')');
     },
     showCloseness: function() {
       var multiplier = this.desireCloseness ? 1 : 0.25;
       this.playfield.scale.setTo(multiplier, multiplier);
+    },
+    maybeWin: function() {
+      if (this.brosGroup.countLiving() > 0) { return; }
+      if (this.numberOfAvailableBros > 0) { return; }
+      this.hasPlayerAchievedVictory = true;
     }
   };
 

@@ -23,6 +23,7 @@ Preload.prototype = {
     this.load.image('hut2', 'assets/hut2.png');
     this.load.image('zoombutton', 'assets/zoombutton.png');
     this.load.audio('buttonpress', 'assets/button-03.wav');
+    this.load.audio('buttonfail', 'assets/zipdown.wav');
     this.load.audio('cry1', 'assets/cry-01.wav');
     this.load.audio('cry2', 'assets/cry-02.wav');
     this.load.audio('cry3', 'assets/cry-03.wav');
@@ -65,6 +66,11 @@ Preload.prototype = {
       'assets/ambient-music.opus',
       'assets/ambient-music.ogg',
       'assets/ambient-music.wav'
+    ]);
+    this.load.audio('winmusic', [
+      'assets/forward-music.opus',
+      'assets/forward-music.ogg',
+      'assets/forward-music.wav'
     ]);
 
   },
