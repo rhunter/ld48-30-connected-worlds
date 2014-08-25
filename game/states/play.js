@@ -11,15 +11,18 @@
       this.game.physics.arcade.enable(this);
       this.anchor.setTo(0.5, 1.0);
       this.health = 100;
-      this.body.collideWorldBounds = true;
+      this.body.collideWorldBounds = false;
       this.body.bounce.set(1.0);
 
-      this.game.time.events.add(Phaser.Timer.SECOND * this.game.rnd.between(3,8), this.turn, this);
+      var when = this.game.rnd.between(3,8);
+
+      this.game.time.events.add(Phaser.Timer.SECOND * when, this.decideNextMove, this);
   }
   WanderingDude.prototype = Object.create(Phaser.Sprite.prototype);
   WanderingDude.prototype.constructor = WanderingDude;
   WanderingDude.prototype.update = function() {
     // collision with invisible walls is hard
+    // (or is it? what about sprite.overlapping(playfield))
     // hardcoded sector borders:  [[150,200], [860,460]]
     if(this.x < 150) {
       this.body.velocity.x = Math.abs(this.body.velocity.x) * this.body.bounce.x;
@@ -37,21 +40,17 @@
     }
   }
   WanderingDude.prototype.decideNextMove = function() {
-    if (Math.floor(Math.abs(this.body.velocity.x)) > 1 &&
-      Math.floor(Math.abs(this.body.velocity.y)) > 1) {
-      this.turn();
-    } else {
-      // todo actually make sure he starts walking again?
-      this.body.velocity.setTo(25,25);
-    }
+    //if rally point flag is set, go there
+    //if there are enemies nearby, head toward them
+    //if there are friends nearby, head away from them
+    //otherwise just go wherever
+    this.turn();
 
     this.game.time.events.add(Phaser.Timer.SECOND * this.game.rnd.between(3,8), this.decideNextMove, this);
   };
   WanderingDude.prototype.turn = function() {
-    var oldX = this.body.velocity.x;
-    var oldY = this.body.velocity.y;
-    this.body.velocity.x = oldY;
-    this.body.velocity.y = oldX;
+    this.body.velocity.x = this.game.rnd.pick([-25,0,25]);
+    this.body.velocity.y = this.game.rnd.pick([-25,0,0,0,25]);
   }
 
   Play.prototype = {
@@ -195,7 +194,6 @@
     onDudeKilled: function(dude) {
       var sound = this.game.rnd.pick(this.dyingSounds);
       sound.play();
-      console.log(arguments);
 
       this.explosionEmitter.at(dude);
       this.explosionEmitter.start(true, 300, null, 10)
