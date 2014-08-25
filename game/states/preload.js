@@ -15,7 +15,8 @@ Preload.prototype = {
     this.load.tilemap('mytilemap', 'assets/worldmap.json', null, Phaser.Tilemap.TILED_JSON);
     this.load.image('sky', 'assets/space.png');
     this.load.image('land', 'assets/sector.png');
-    this.load.image('noise', 'assets/noise.png');
+    this.load.spritesheet('noisered', 'assets/noisered.png', 3, 2);
+    this.load.spritesheet('noiseblue', 'assets/noiseblue.png', 3, 2);
     this.load.image('dudebutton', 'assets/dude.png');
     this.load.image('dude1', 'assets/dude1.png');
     this.load.image('dude2', 'assets/dude2.png');

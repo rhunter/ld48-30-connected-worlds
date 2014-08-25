@@ -155,7 +155,7 @@
 
 
       this.explosionEmitter = this.game.add.emitter(0,0, 100);
-      this.explosionEmitter.makeParticles('noise');
+      this.explosionEmitter.makeParticles('noisered');
       this.explosionEmitter.gravity = 200;
 
       this.cursors = this.game.input.keyboard.createCursorKeys();
