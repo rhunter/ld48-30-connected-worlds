@@ -59,6 +59,7 @@
       this.desireCloseness = true;
       this.numberOfAvailableDudes = 30;
       this.numberOfAvailableBros = 30;
+      this.game.world.setBounds(0,0,1024,768);
     },
     create: function() {
       this.skyLayer = this.game.add.group();
@@ -157,9 +158,11 @@
       this.explosionEmitter.makeParticles('noise');
       this.explosionEmitter.gravity = 200;
 
+      this.cursors = this.game.input.keyboard.createCursorKeys();
     },
     update: function() {
       this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup, this.onFolksMeet, null, this);
+      this.handleScrolling();
       this.showCloseness();
       this.showNumbers();
       this.maybeWin();
@@ -222,6 +225,14 @@
       sprite.events.onKilled.add(this.onDudeKilled, this);
       this.brosGroup.add(sprite);
       this.buttonSound.play();
+    },
+    handleScrolling: function() {
+      if (this.cursors.left.isDown) {
+        this.game.camera.x -= 4
+      }
+      if (this.cursors.right.isDown) {
+        this.game.camera.x += 4
+      }
     },
     showNumbers: function() {
       this.uiDudeCountLabel.setText(this.numberOfAvailableDudes.toString() + '(+' + this.dudesGroup.countLiving() + ')');
