@@ -3,11 +3,12 @@
   function Play() {}
   function WanderingDude(game, x, y, options) {
     this.affiliation = options.affiliation;
+    this.rallyFlag = options.rallyFlag;
     Phaser.Sprite.call(this, game, x, y, 'dude' + this.affiliation);
 
     // this.timeSinceLastTurn = 0;
     // this.timeSinceLastMateSeen = 0;
-    // this.desiredLocation = new Phaser.Point();
+      this.desiredLocation = new Phaser.Point();
       this.game.physics.arcade.enable(this);
       this.anchor.setTo(0.5, 1.0);
       this.health = 100;
@@ -41,16 +42,28 @@
   }
   WanderingDude.prototype.decideNextMove = function() {
     //if rally point flag is set, go there
+    if (this.rallyFlag.visible) {
+      this.desiredLocation.copyFrom(this.rallyFlag.position);
+    }
+
     //if there are enemies nearby, head toward them
     //if there are friends nearby, head away from them
     //otherwise just go wherever
-    this.turn();
+    else {
+      this.aimForWherever();
+    }
+
+    this.turnTowardDesire();
 
     this.game.time.events.add(Phaser.Timer.SECOND * this.game.rnd.between(3,8), this.decideNextMove, this);
   };
-  WanderingDude.prototype.turn = function() {
-    this.body.velocity.x = this.game.rnd.pick([-25,0,25]);
-    this.body.velocity.y = this.game.rnd.pick([-25,0,0,0,25]);
+  WanderingDude.prototype.aimForWherever = function() {
+    this.desiredLocation.x = this.game.rnd.between(0,800);
+    this.desiredLocation.y = this.game.rnd.between(300, 500);
+  }
+  WanderingDude.prototype.turnTowardDesire = function() {
+    var newVelocity = Phaser.Point.subtract(this.desiredLocation, this.position).setMagnitude(25);
+    this.body.velocity.copyFrom(newVelocity);
   }
 
   Play.prototype = {
@@ -67,7 +80,11 @@
       this.skyLayer.add(this.game.add.sprite(0,0,'sky'));
       this.playfield = this.game.add.group();
       this.playfield.z = 1;
-      this.playfield.add(this.game.add.sprite(0,0,'land'));
+      this.landSprite = this.game.add.sprite(0,0,'land');
+      this.playfield.add(this.landSprite)
+
+      this.landSprite.inputEnabled = true;
+      this.landSprite.events.onInputDown.add(this.onTouchLand, this);
 
       this.buildingsGroup = this.game.add.group(this.playfield);
       this.buildingsGroup.z = 2;
@@ -150,9 +167,19 @@
       ];
       this.buttonSound = this.game.add.sound('buttonpress');
       this.deadButtonSound = this.game.add.sound('buttonfail');
+      this.flagPlantedSound = this.game.add.sound('flagup');
+      this.flagRemovedSound = this.game.add.sound('flagdown');
       this.music = this.game.add.sound('music',1,true);
       this.music.play();
 
+      this.targetFlag = this.game.add.sprite(0,0, 'flag');
+      this.targetFlag.anchor.setTo(0.5, 0.5);
+      this.targetFlag.alpha = 0.2;
+      this.targetFlag.visible = false;
+      this.targetFlag.inputEnabled = true;
+      this.targetFlag.events.onInputDown.add(this.onTouchFlag, this);
+      this.enemyFlag = this.game.add.sprite(0,0, 'flag');
+      this.enemyFlag.visible = false;
 
       this.explosionEmitter = this.game.add.emitter(0,0, 100);
       this.explosionEmitter.makeParticles('noisered');
@@ -188,7 +215,7 @@
         return;
       }
       this.numberOfAvailableDudes--;
-      var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1});
+      var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1, rallyFlag: this.targetFlag});
       dude.body.velocity.setTo(25, 25);
       this.dudesGroup.add(dude);
       this.buttonSound.play();
@@ -199,6 +226,13 @@
 
       this.explosionEmitter.at(dude);
       this.explosionEmitter.start(true, 300, null, 10)
+    },
+    onTouchLand: function(land, pointer) {
+      // TODO: work with scrolled map
+      this.plantFlagAt(pointer.positionDown);
+    },
+    onTouchFlag: function(flag, pointer) {
+      this.removeFlag();
     },
     onWin: function() {
       var blackness = this.game.add.graphics(0,0);
@@ -218,7 +252,7 @@
         return;
       }
       this.numberOfAvailableBros--;
-      var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2});
+      var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2, rallyFlag: this.enemyFlag});
       this.game.physics.arcade.enable(sprite);
       sprite.body.velocity.setTo(-25, 25);
       sprite.events.onKilled.add(this.onDudeKilled, this);
@@ -245,6 +279,17 @@
       if (this.brosGroup.countLiving() > 0) { return; }
       if (this.numberOfAvailableBros > 0) { return; }
       this.hasPlayerAchievedVictory = true;
+    },
+    plantFlagAt: function(pos) {
+      this.targetFlag.position.copyFrom(pos);
+      this.targetFlag.visible = true; // TODO: slide in/up
+      this.targetFlag.alpha = 1.0;
+      var fadingTween = this.game.add.tween(this.targetFlag).to({alpha: 0.25}, 200, Phaser.Easing.Linear.None, true);
+      this.flagPlantedSound.play();
+    },
+    removeFlag: function() {
+      this.targetFlag.visible = false; // TODO: slide away
+      this.flagRemovedSound.play();
     }
   };
 
