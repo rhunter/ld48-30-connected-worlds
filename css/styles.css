@@ -3,7 +3,7 @@ body {
 }
 
 #ld48-30-connected-worlds {
-  border: 2px solid white;
+  outline: 2px solid white;
   width: 800px;
   margin-left: auto;
   margin-right: auto;
