@@ -5,6 +5,14 @@ function Preload() {
   this.ready = false;
 }
 
+// HACK: Firefox (31 on Mac) claims to support Ogg and Web Audio but
+// throws errors on decoding the streams.
+//
+// User agent sniffing makes the problem "go away" for now, but Firefox
+// will eventually fix the decoding issue (and another browser/platform
+// might have the same problem). I'd prefer to detect the feature.
+window.PhaserGlobal = {disableWebAudio: /Firefox/.test(navigator.userAgent)};
+
 Preload.prototype = {
   preload: function() {
     this.asset = this.add.sprite(this.width/2,this.height/2, 'preloader');
@@ -23,57 +31,48 @@ Preload.prototype = {
     this.load.image('hut1', 'assets/hut1.png');
     this.load.image('hut2', 'assets/hut2.png');
     this.load.image('zoombutton', 'assets/zoombutton.png');
-    this.load.audio('buttonpress', 'assets/button-03.wav');
-    this.load.audio('buttonfail', 'assets/zipdown.wav');
-    this.load.audio('cry1', 'assets/cry-01.wav');
-    this.load.audio('cry2', 'assets/cry-02.wav');
-    this.load.audio('cry3', 'assets/cry-03.wav');
-    this.load.audio('cry4', 'assets/cry-04.wav');
-    this.load.audio('cry5', 'assets/cry-05.wav');
-    this.load.audio('cry6', 'assets/cry-06.wav');
-    this.load.audio('cry7', 'assets/cry-07.wav');
-    this.load.audio('cry8', 'assets/cry-08.wav');
-    this.load.audio('cry9', 'assets/cry-09.wav');
-    this.load.audio('cry10', 'assets/cry-10.wav');
-    this.load.audio('sword1', 'assets/sword-01.wav');
-    this.load.audio('sword2', 'assets/sword-02.wav');
-    this.load.audio('sword3', 'assets/sword-03.wav');
-    this.load.audio('sword4', 'assets/sword-04.wav');
-    this.load.audio('sword5', 'assets/sword-05.wav');
-    this.load.audio('sword6', 'assets/sword-06.wav');
-    this.load.audio('sword7', 'assets/sword-07.wav');
-    this.load.audio('sword8', 'assets/sword-08.wav');
-    this.load.audio('sword9', 'assets/sword-09.wav');
-    this.load.audio('sword10', 'assets/sword-10.wav');
-    this.load.audio('sword11', 'assets/sword-11.wav');
-    this.load.audio('sword12', 'assets/sword-12.wav');
-    this.load.audio('sword13', 'assets/sword-13.wav');
-    this.load.audio('sword14', 'assets/sword-14.wav');
-    this.load.audio('sword15', 'assets/sword-15.wav');
-    this.load.audio('sword16', 'assets/sword-16.wav');
-    this.load.audio('sword17', 'assets/sword-17.wav');
-    this.load.audio('sword18', 'assets/sword-18.wav');
-    this.load.audio('sword19', 'assets/sword-19.wav');
-    this.load.audio('sword20', 'assets/sword-20.wav');
-    this.load.audio('sword21', 'assets/sword-21.wav');
-    this.load.audio('sword22', 'assets/sword-22.wav');
-    this.load.audio('sword23', 'assets/sword-23.wav');
-    this.load.audio('sword24', 'assets/sword-24.wav');
-    this.load.audio('sword25', 'assets/sword-25.wav');
-    this.load.audio('sword26', 'assets/sword-26.wav');
-    this.load.audio('sword27', 'assets/sword-27.wav');
-    this.load.audio('sword28', 'assets/sword-28.wav');
-    this.load.audio('music', [
-      'assets/ambient-music.opus',
-      'assets/ambient-music.ogg',
-      'assets/ambient-music.wav'
-    ]);
-    this.load.audio('winmusic', [
-      'assets/forward-music.opus',
-      'assets/forward-music.ogg',
-      'assets/forward-music.wav'
-    ]);
-
+    this.load.audio('buttonpress', ['assets/button-03.ogg', 'assets/button-03.mp3']);
+    this.load.audio('buttonfail', ['assets/zipdown.ogg', 'assets/zipdown.mp3']);
+    this.load.audio('cry1', ['assets/cry-01.ogg', 'assets/cry-01.mp3']);
+    this.load.audio('cry2', ['assets/cry-02.ogg', 'assets/cry-02.mp3']);
+    this.load.audio('cry3', ['assets/cry-03.ogg', 'assets/cry-03.mp3']);
+    this.load.audio('cry4', ['assets/cry-04.ogg', 'assets/cry-04.mp3']);
+    this.load.audio('cry5', ['assets/cry-05.ogg', 'assets/cry-05.mp3']);
+    this.load.audio('cry6', ['assets/cry-06.ogg', 'assets/cry-06.mp3']);
+    this.load.audio('cry7', ['assets/cry-07.ogg', 'assets/cry-07.mp3']);
+    this.load.audio('cry8', ['assets/cry-08.ogg', 'assets/cry-08.mp3']);
+    this.load.audio('cry9', ['assets/cry-09.ogg', 'assets/cry-09.mp3']);
+    this.load.audio('cry10', ['assets/cry-10.ogg', 'assets/cry-10.mp3']);
+    this.load.audio('sword1', ['assets/sword-01.ogg', 'assets/sword-01.mp3']);
+    this.load.audio('sword2', ['assets/sword-02.ogg', 'assets/sword-02.mp3']);
+    this.load.audio('sword3', ['assets/sword-03.ogg', 'assets/sword-03.mp3']);
+    this.load.audio('sword4', ['assets/sword-04.ogg', 'assets/sword-04.mp3']);
+    this.load.audio('sword5', ['assets/sword-05.ogg', 'assets/sword-05.mp3']);
+    this.load.audio('sword6', ['assets/sword-06.ogg', 'assets/sword-06.mp3']);
+    this.load.audio('sword7', ['assets/sword-07.ogg', 'assets/sword-07.mp3']);
+    this.load.audio('sword8', ['assets/sword-08.ogg', 'assets/sword-08.mp3']);
+    this.load.audio('sword9', ['assets/sword-09.ogg', 'assets/sword-09.mp3']);
+    this.load.audio('sword10', ['assets/sword-10.ogg', 'assets/sword-10.mp3']);
+    this.load.audio('sword11', ['assets/sword-11.ogg', 'assets/sword-11.mp3']);
+    this.load.audio('sword12', ['assets/sword-12.ogg', 'assets/sword-12.mp3']);
+    this.load.audio('sword13', ['assets/sword-13.ogg', 'assets/sword-13.mp3']);
+    this.load.audio('sword14', ['assets/sword-14.ogg', 'assets/sword-14.mp3']);
+    this.load.audio('sword15', ['assets/sword-15.ogg', 'assets/sword-15.mp3']);
+    this.load.audio('sword16', ['assets/sword-16.ogg', 'assets/sword-16.mp3']);
+    this.load.audio('sword17', ['assets/sword-17.ogg', 'assets/sword-17.mp3']);
+    this.load.audio('sword18', ['assets/sword-18.ogg', 'assets/sword-18.mp3']);
+    this.load.audio('sword19', ['assets/sword-19.ogg', 'assets/sword-19.mp3']);
+    this.load.audio('sword20', ['assets/sword-20.ogg', 'assets/sword-20.mp3']);
+    this.load.audio('sword21', ['assets/sword-21.ogg', 'assets/sword-21.mp3']);
+    this.load.audio('sword22', ['assets/sword-22.ogg', 'assets/sword-22.mp3']);
+    this.load.audio('sword23', ['assets/sword-23.ogg', 'assets/sword-23.mp3']);
+    this.load.audio('sword24', ['assets/sword-24.ogg', 'assets/sword-24.mp3']);
+    this.load.audio('sword25', ['assets/sword-25.ogg', 'assets/sword-25.mp3']);
+    this.load.audio('sword26', ['assets/sword-26.ogg', 'assets/sword-26.mp3']);
+    this.load.audio('sword27', ['assets/sword-27.ogg', 'assets/sword-27.mp3']);
+    this.load.audio('sword28', ['assets/sword-28.ogg', 'assets/sword-28.mp3']);
+    this.load.audio('music', ['assets/ambient-music.ogg', 'assets/ambient-music.mp3']);
+    this.load.audio('winmusic', ['assets/forward-music.ogg', 'assets/forward-music.mp3']);
   },
   create: function() {
     this.asset.cropEnabled = false;
