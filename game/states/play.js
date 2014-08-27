@@ -174,7 +174,6 @@
       //this.game.debug.bodyInfo(window.myborders[0], 32, 32);
     },
     onZoomButton: function() {
-      this.hasPlayerAchievedVictory = true;
       this.desireCloseness = !this.desireCloseness;
     },
     onFolksMeet: function(dude, bro) {
