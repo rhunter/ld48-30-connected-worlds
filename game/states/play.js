@@ -200,6 +200,9 @@
     render: function() {
       //this.game.debug.bodyInfo(window.myborders[0], 32, 32);
     },
+    shutdown: function() {
+      this.music.stop();
+    },
     onZoomButton: function() {
       this.desireCloseness = !this.desireCloseness;
     },

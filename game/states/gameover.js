@@ -24,6 +24,9 @@ GameOver.prototype = {
     if(this.game.input.activePointer.justPressed()) {
       this.game.state.start('play');
     }
+  },
+  shutdown: function() {
+    this.music.stop();
   }
 };
 module.exports = GameOver;
