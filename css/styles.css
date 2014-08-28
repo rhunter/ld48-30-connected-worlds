@@ -1,6 +1,19 @@
 body {
   background-color: #333;
+  margin: 0px;
 }
+
+@media screen and (min-height: 608px) {
+  body {
+    margin-top: 8px;
+  }
+}
+@media screen and (min-height: 960px) {
+  body {
+    margin-top: 120px;
+  }
+}
+
 
 #ld48-30-connected-worlds {
   outline: 2px solid white;
