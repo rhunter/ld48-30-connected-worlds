@@ -192,6 +192,8 @@
       this.targetFlag.visible = false;
       this.targetFlag.inputEnabled = true;
       this.targetFlag.events.onInputDown.add(this.onTouchFlag, this);
+      this.playfield.add(this.targetFlag)
+
       this.enemyFlag = this.game.add.sprite(0,0, 'flag');
       this.enemyFlag.visible = false;
 
@@ -245,8 +247,13 @@
       this.explosionEmitter.start(true, 300, null, 10)
     },
     onTouchLand: function(land, pointer) {
-      // TODO: work with scrolled map
-      this.plantFlagAt(pointer.positionDown);
+      if (!this.desireCloseness) {
+        // zoomed out, the player might *move* the land
+        return;
+      }
+      // XXX: only works with unzoomed map
+      var worldPositionTouched = Phaser.Point.add(this.game.camera, pointer.positionDown);
+      this.plantFlagAt(worldPositionTouched);
     },
     onTouchFlag: function(flag, pointer) {
       this.removeFlag();
