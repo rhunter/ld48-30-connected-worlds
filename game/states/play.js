@@ -132,8 +132,8 @@
       this.uiBroCountLabel.anchor.setTo(0.5, 0.5)
 
 
-      this.uiGroup.add(this.uiDudeCountLabel);
-      this.uiGroup.add(this.uiBroCountLabel)
+      this.playfield.add(this.uiDudeCountLabel);
+      this.playfield.add(this.uiBroCountLabel)
 
       this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -285,6 +285,9 @@
       }
     },
     showNumbers: function() {
+      this.uiDudeCountLabel.visible = this.desireCloseness;
+      this.uiBroCountLabel.visible = this.desireCloseness;
+
       this.uiDudeCountLabel.setText(this.numberOfAvailableDudes.toString() + '(+' + this.dudesGroup.countLiving() + ')');
       this.uiBroCountLabel.setText(this.numberOfAvailableBros.toString() + '(+' + this.brosGroup.countLiving() + ')');
     },
