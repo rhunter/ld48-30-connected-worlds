@@ -65,6 +65,20 @@
     var newVelocity = Phaser.Point.subtract(this.desiredLocation, this.position).setMagnitude(25);
     this.body.velocity.copyFrom(newVelocity);
   }
+  WanderingDude.prototype.damage = function(amount) {
+    Phaser.Sprite.prototype.damage.call(this, amount);
+    if (this.alive) {
+      this.flash();
+    }
+  }
+  WanderingDude.prototype.flash = function() {
+    var restoreTint = function() {
+      this.tint = 0xffffff;
+    }
+    this.tint = 0xff8080;
+
+    this.game.time.events.add(100, restoreTint, this);
+  }
 
   Play.prototype = {
     init: function() {
