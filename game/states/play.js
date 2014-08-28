@@ -94,8 +94,23 @@
       this.skyLayer.add(this.game.add.sprite(0,0,'sky'));
       this.playfield = this.game.add.group();
       this.playfield.z = 1;
+
+      this.land1 = this.game.add.group(this.playfield);
       this.landSprite = this.game.add.sprite(0,0,'land');
-      this.playfield.add(this.landSprite)
+      // TODO: make sure things still work when anchored in the middle
+      this.landSprite.z = 10;
+      this.land1.add(this.landSprite)
+
+      this.land2 = this.game.add.group(this.playfield);
+      this.land2.z = 5;
+      this.landSprite2 = this.game.add.sprite(1600,400,'land');
+      this.landSprite2.anchor.setTo(0.5, 0.5);
+      this.landSprite2.z = 1;
+      this.landSprite2.tint = 0x808080;
+      this.game.physics.arcade.enable(this.landSprite2);
+      this.landSprite2.inputEnabled = true;
+      this.landSprite2.events.onInputDown.add(this.onTouchLand, this);
+      this.land2.add(this.landSprite2)
 
       this.landSprite.inputEnabled = true;
       this.landSprite.events.onInputDown.add(this.onTouchLand, this);
@@ -202,6 +217,8 @@
       this.explosionEmitter.gravity = 200;
 
       this.cursors = this.game.input.keyboard.createCursorKeys();
+
+      this.playfield.sort();
     },
     update: function() {
       this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup, this.onFolksMeet, null, this);
@@ -248,7 +265,9 @@
     },
     onTouchLand: function(land, pointer) {
       if (!this.desireCloseness) {
-        // zoomed out, the player might *move* the land
+        this.landSprite.tint = 0x808080;
+        this.landSprite2.tint = 0x808080;
+        land.tint = 0xffffff;
         return;
       }
       // XXX: only works with unzoomed map
@@ -313,6 +332,9 @@
       this.targetFlag.alpha = 1.0;
       var fadingTween = this.game.add.tween(this.targetFlag).to({alpha: 0.25}, 200, Phaser.Easing.Linear.None, true);
       this.flagPlantedSound.play();
+
+      var newLandVelocity = Phaser.Point.subtract(pos, this.landSprite2.position).setMagnitude(5);
+      this.landSprite2.body.velocity.copyFrom(newLandVelocity);
     },
     removeFlag: function() {
       this.targetFlag.visible = false; // TODO: slide away
