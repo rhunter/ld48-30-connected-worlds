@@ -1,5 +1,35 @@
 
   'use strict';
+  // XXX: monkey patch
+  // Phaser (in 2.0.7) doesn't scale bodies when their parent sprite is scaled indirectly (via a group)
+
+    var updateBoundsConsideringContainerScale = function () {
+        // this bit is relevant
+        var ptr, asx = 1, asy = 1;
+        for (ptr = this.sprite; ptr.parent ; ptr = ptr.parent) {
+          asx *= ptr.scale.x;
+          asy *= ptr.scale.y;
+        }
+
+        asx = Math.abs(asx);
+        asy = Math.abs(asy);
+
+        if (asx !== this._sx || asy !== this._sy)
+        {
+            this.width = this.sourceWidth * asx;
+            this.height = this.sourceHeight * asy;
+            this.halfWidth = Math.floor(this.width / 2);
+            this.halfHeight = Math.floor(this.height / 2);
+            this._sx = asx;
+            this._sy = asy;
+            this.center.setTo(this.position.x + this.halfWidth, this.position.y + this.halfHeight);
+
+            this._reset = true;
+        }
+
+    }
+
+
   function Play() {}
   function WanderingDude(game, x, y, options) {
     this.affiliation = options.affiliation;
@@ -10,6 +40,7 @@
     // this.timeSinceLastMateSeen = 0;
       this.desiredLocation = new Phaser.Point();
       this.game.physics.arcade.enable(this);
+      this.body.updateBounds = updateBoundsConsideringContainerScale;
       this.anchor.setTo(0.5, 1.0);
       this.health = 100;
       this.body.collideWorldBounds = false;
@@ -102,6 +133,7 @@
       this.landSprite.anchor.setTo(0.5, 0.4);
       this.landSprite.z = 10;
       this.game.physics.arcade.enable(this.landSprite);
+      this.landSprite.body.updateBounds = updateBoundsConsideringContainerScale;
       this.landSprite.body.setSize(760, 290, -20, -10);
       this.land1.add(this.landSprite)
 
@@ -113,6 +145,7 @@
       this.landSprite2.z = 1;
       this.landSprite2.tint = 0x808080;
       this.game.physics.arcade.enable(this.landSprite2);
+      this.landSprite2.body.updateBounds = updateBoundsConsideringContainerScale;
       this.landSprite2.body.setSize(750, 300, 15, 0);
       this.landSprite2.inputEnabled = true;
       this.landSprite2.events.onInputDown.add(this.onTouchLand, this);
@@ -241,6 +274,8 @@
       }
     },
     render: function() {
+      // this.dudesGroup.forEachAlive(this.game.debug.body, this.game.debug);
+      // this.brosGroup.forEachAlive(this.game.debug.body, this.game.debug);
       // this.game.debug.body(this.landSprite);
       // this.game.debug.body(this.landSprite2);
       // this.game.debug.bodyInfo(this.landSprite2, 32, 32);
