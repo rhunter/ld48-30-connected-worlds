@@ -31,6 +31,26 @@
 
 
   function Play() {}
+  function Island(x, y, game, parent, name, addToStage, enableBody, physicsBodyType) {
+    var actualName = name ? name : 'island';
+    Phaser.Group.prototype.constructor.call(this, game, parent, actualName, addToStage, enableBody, physicsBodyType);
+
+    this.outerSprite = this.create(x, y, 'landouter');
+    this.outerSprite.anchor.setTo(0.5, 0.5);
+    this.innerSprite = this.create(x, y, 'landsurface');
+    this.innerSprite.anchor.setTo(0.5, 0.5);
+    this.outerSprite.position = this.innerSprite.position; // everything should move together
+    this.outerSprite.z = 10;
+    this.innerSprite.z = 12;
+    this.game.physics.arcade.enable(this.innerSprite);
+    this.innerSprite.body.updateBounds = updateBoundsConsideringContainerScale;
+    this.hasMadeContactWithAnotherLand = false;
+  }
+
+  Island.prototype = Object.create(Phaser.Group.prototype);
+  Island.prototype.constructor = Island;
+  Island.prototype.update = function() {
+  }
   function WanderingDude(game, x, y, options) {
     this.affiliation = options.affiliation;
     this.rallyFlag = options.rallyFlag;
@@ -126,31 +146,14 @@
       this.playfield = this.game.add.group(this.game.world, 'playfield');
       this.playfield.z = 1;
 
-      this.land1 = this.game.add.group(this.playfield, 'land1');
-      this.landSprite = this.game.add.sprite(540,330,'land');
-      var rect = new Phaser.Rectangle(100, 140, 890, 450);
-      this.landSprite.crop(rect);
-      this.landSprite.anchor.setTo(0.5, 0.4);
-      this.landSprite.z = 10;
-      this.game.physics.arcade.enable(this.landSprite);
-      this.landSprite.body.updateBounds = updateBoundsConsideringContainerScale;
-      this.landSprite.body.setSize(760, 290, -20, -10);
-      this.land1.add(this.landSprite)
-
-      this.land2 = this.game.add.group(this.playfield, 'land2');
-      this.land2.z = 5;
-      this.landSprite2 = this.game.add.sprite(1600,400,'land');
-      this.landSprite.crop(rect);
-      this.landSprite2.anchor.setTo(0.5, 0.4);
-      this.landSprite2.z = 1;
-      this.landSprite2.tint = 0x808080;
-      this.game.physics.arcade.enable(this.landSprite2);
-      this.landSprite2.body.updateBounds = updateBoundsConsideringContainerScale;
-      this.landSprite2.body.setSize(750, 300, 15, 0);
+      this.land1 = new Island(540, 330, this.game, this.playfield, 'land1');
+      this.landSprite = this.land1.innerSprite;
+      this.land1.z = 0;
+      this.land2 = new Island(1600, 400, this.game, this.playfield, 'land2');
+      this.land2.z = 1;
+      this.landSprite2 = this.land2.innerSprite;
       this.landSprite2.inputEnabled = true;
       this.landSprite2.events.onInputDown.add(this.onTouchLand, this);
-      this.land2.add(this.landSprite2)
-
       this.landSprite.inputEnabled = true;
       this.landSprite.events.onInputDown.add(this.onTouchLand, this);
 
@@ -263,7 +266,7 @@
     update: function() {
       this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup, this.onFolksMeet, null, this);
       if (!this.landSprite.hasMadeContactWithAnotherLand) {
-        this.game.physics.arcade.collide(this.landSprite, this.landSprite2, this.onWorldsCollide, null, this);
+        this.game.physics.arcade.collide(this.land1, this.land2, this.onWorldsCollide, null, this);
       }
       this.handleScrolling();
       this.showCloseness();
