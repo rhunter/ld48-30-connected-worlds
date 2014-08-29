@@ -120,13 +120,13 @@
       this.game.world.setBounds(0,0,1024,768);
     },
     create: function() {
-      this.skyLayer = this.game.add.group();
+      this.skyLayer = this.game.add.group(this.game.world, 'sky');
       this.skyLayer.z = 0;
       this.skyLayer.add(this.game.add.sprite(0,0,'sky'));
-      this.playfield = this.game.add.group();
+      this.playfield = this.game.add.group(this.game.world, 'playfield');
       this.playfield.z = 1;
 
-      this.land1 = this.game.add.group(this.playfield);
+      this.land1 = this.game.add.group(this.playfield, 'land1');
       this.landSprite = this.game.add.sprite(540,330,'land');
       var rect = new Phaser.Rectangle(100, 140, 890, 450);
       this.landSprite.crop(rect);
@@ -137,7 +137,7 @@
       this.landSprite.body.setSize(760, 290, -20, -10);
       this.land1.add(this.landSprite)
 
-      this.land2 = this.game.add.group(this.playfield);
+      this.land2 = this.game.add.group(this.playfield, 'land2');
       this.land2.z = 5;
       this.landSprite2 = this.game.add.sprite(1600,400,'land');
       this.landSprite.crop(rect);
