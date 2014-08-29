@@ -36,6 +36,7 @@ Preload.prototype = {
     this.load.audio('buttonfail', ['assets/zipdown.ogg', 'assets/zipdown.mp3']);
     this.load.audio('flagup', ['assets/zipup.ogg', 'assets/zipup.mp3']);
     this.load.audio('flagdown', ['assets/zipdown.ogg', 'assets/zipdown.mp3']);
+    this.load.audio('worldscrape', ['assets/boomcrunch.ogg', 'assets/boomcrunch.mp3']);
     this.load.audio('cry1', ['assets/cry-01.ogg', 'assets/cry-01.mp3']);
     this.load.audio('cry2', ['assets/cry-02.ogg', 'assets/cry-02.mp3']);
     this.load.audio('cry3', ['assets/cry-03.ogg', 'assets/cry-03.mp3']);

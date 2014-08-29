@@ -96,18 +96,24 @@
       this.playfield.z = 1;
 
       this.land1 = this.game.add.group(this.playfield);
-      this.landSprite = this.game.add.sprite(0,0,'land');
-      // TODO: make sure things still work when anchored in the middle
+      this.landSprite = this.game.add.sprite(540,330,'land');
+      var rect = new Phaser.Rectangle(100, 140, 890, 450);
+      this.landSprite.crop(rect);
+      this.landSprite.anchor.setTo(0.5, 0.4);
       this.landSprite.z = 10;
+      this.game.physics.arcade.enable(this.landSprite);
+      this.landSprite.body.setSize(760, 290, -20, -10);
       this.land1.add(this.landSprite)
 
       this.land2 = this.game.add.group(this.playfield);
       this.land2.z = 5;
       this.landSprite2 = this.game.add.sprite(1600,400,'land');
-      this.landSprite2.anchor.setTo(0.5, 0.5);
+      this.landSprite.crop(rect);
+      this.landSprite2.anchor.setTo(0.5, 0.4);
       this.landSprite2.z = 1;
       this.landSprite2.tint = 0x808080;
       this.game.physics.arcade.enable(this.landSprite2);
+      this.landSprite2.body.setSize(750, 300, 15, 0);
       this.landSprite2.inputEnabled = true;
       this.landSprite2.events.onInputDown.add(this.onTouchLand, this);
       this.land2.add(this.landSprite2)
@@ -115,7 +121,7 @@
       this.landSprite.inputEnabled = true;
       this.landSprite.events.onInputDown.add(this.onTouchLand, this);
 
-      this.buildingsGroup = this.game.add.group(this.playfield);
+      this.buildingsGroup = this.game.add.group(this.land1);
       this.buildingsGroup.z = 2;
       this.dudeHouse = this.game.add.sprite(200, 240, 'hut1');
       this.dudeHouse.anchor.setTo(0.5, 0.7)
@@ -198,6 +204,7 @@
       this.deadButtonSound = this.game.add.sound('buttonfail');
       this.flagPlantedSound = this.game.add.sound('flagup');
       this.flagRemovedSound = this.game.add.sound('flagdown');
+      this.scrapingSound = this.game.add.sound('worldscrape');
       this.music = this.game.add.sound('music',1,true);
       this.music.play();
 
@@ -222,6 +229,9 @@
     },
     update: function() {
       this.game.physics.arcade.collide(this.dudesGroup, this.brosGroup, this.onFolksMeet, null, this);
+      if (!this.landSprite.hasMadeContactWithAnotherLand) {
+        this.game.physics.arcade.collide(this.landSprite, this.landSprite2, this.onWorldsCollide, null, this);
+      }
       this.handleScrolling();
       this.showCloseness();
       this.showNumbers();
@@ -231,7 +241,9 @@
       }
     },
     render: function() {
-      //this.game.debug.bodyInfo(window.myborders[0], 32, 32);
+      // this.game.debug.body(this.landSprite);
+      // this.game.debug.body(this.landSprite2);
+      // this.game.debug.bodyInfo(this.landSprite2, 32, 32);
     },
     shutdown: function() {
       this.music.stop();
@@ -244,6 +256,15 @@
       bro.damage(30);
       this.game.rnd.pick(this.attackSounds).play();
       this.game.rnd.pick(this.attackSounds).play();
+    },
+    onWorldsCollide: function(land1, land2) {
+      console.debug('crash! boom!');
+      this.scrapingSound.play();
+
+      land1.hasMadeContactWithAnotherLand = true;
+      land2.hasMadeContactWithAnotherLand = true;
+      this.game.add.tween(land1.body.velocity).to({x: 0, y: 0}, 2000, Phaser.Easing.Linear.None, true);
+      this.game.add.tween(land2.body.velocity).to({x: 0, y: 0}, 2000, Phaser.Easing.Linear.None, true);
     },
     onSpawnButton: function() {
       if (this.numberOfAvailableDudes < 1) {
@@ -333,8 +354,11 @@
       var fadingTween = this.game.add.tween(this.targetFlag).to({alpha: 0.25}, 200, Phaser.Easing.Linear.None, true);
       this.flagPlantedSound.play();
 
-      var newLandVelocity = Phaser.Point.subtract(pos, this.landSprite2.position).setMagnitude(5);
-      this.landSprite2.body.velocity.copyFrom(newLandVelocity);
+      if (!this.landSprite2.hasMadeContactWithAnotherLand) {
+        //TODO: replace with physics.accelerateTo
+        var newLandVelocity = Phaser.Point.subtract(pos, this.landSprite2.position).setMagnitude(10);
+        this.landSprite2.body.velocity.copyFrom(newLandVelocity);
+      }
     },
     removeFlag: function() {
       this.targetFlag.visible = false; // TODO: slide away
