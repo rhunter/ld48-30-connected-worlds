@@ -1,0 +1,5 @@
+Connected Worlds was made by Rob Hunter.
+
+Initially as an entry for the Ludum Dare competition to build a game from scratch
+within 48 hours, Hunter felt that it was worth spending a bit of time building
+the rest of the game.
