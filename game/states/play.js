@@ -54,6 +54,7 @@
   function WanderingDude(game, x, y, options) {
     this.affiliation = options.affiliation;
     this.rallyFlag = options.rallyFlag;
+    this.allowedWanderingRect = options.keepWithin;
     Phaser.Sprite.call(this, game, x, y, 'dude' + this.affiliation);
 
     // this.timeSinceLastTurn = 0;
@@ -73,21 +74,17 @@
   WanderingDude.prototype = Object.create(Phaser.Sprite.prototype);
   WanderingDude.prototype.constructor = WanderingDude;
   WanderingDude.prototype.update = function() {
-    // collision with invisible walls is hard
-    // (or is it? what about sprite.overlapping(playfield))
-    // hardcoded sector borders:  [[150,200], [860,460]]
-    if(this.x < 150) {
+    if(this.x < this.allowedWanderingRect.left) {
       this.body.velocity.x = Math.abs(this.body.velocity.x) * this.body.bounce.x;
     }
-    if(this.x > 860) {
+    if(this.x > this.allowedWanderingRect.right) {
       this.body.velocity.x = -1 * Math.abs(this.body.velocity.x) * this.body.bounce.x;
     }
 
-    if(this.y < 200) {
+    if(this.y < this.allowedWanderingRect.top) {
       this.body.velocity.y = Math.abs(this.body.velocity.y) * this.body.bounce.y;
     }
-    if(this.y > 460) {
-      //this.y = 460;
+    if(this.y > this.allowedWanderingRect.bottom) {
       this.body.velocity.y = -1 * Math.abs(this.body.velocity.y) * this.body.bounce.y;
     }
   }
@@ -310,7 +307,7 @@
         return;
       }
       this.numberOfAvailableDudes--;
-      var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1, rallyFlag: this.targetFlag});
+      var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1, rallyFlag: this.targetFlag, keepWithin: this.landSprite.getBounds()});
       dude.body.velocity.setTo(25, 25);
       this.dudesGroup.add(dude);
       this.buttonSound.play();
@@ -354,7 +351,7 @@
         return;
       }
       this.numberOfAvailableBros--;
-      var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2, rallyFlag: this.enemyFlag});
+      var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2, rallyFlag: this.enemyFlag, keepWithin: this.landSprite.getBounds()});
       this.game.physics.arcade.enable(sprite);
       sprite.body.velocity.setTo(-25, 25);
       sprite.events.onKilled.add(this.onDudeKilled, this);
