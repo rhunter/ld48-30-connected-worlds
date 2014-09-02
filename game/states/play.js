@@ -346,11 +346,12 @@
     },
     onWin: function() {
       var blackness = this.game.add.graphics(0,0);
+      blackness.fixedToCamera = true;
       blackness.beginFill('black');
       blackness.drawRect(0,0,this.game.width, this.game.height);
-      blackness.alpha = 1;
       blackness.endFill();
-      var fadingTween = this.game.add.tween(blackness).to({alpha: 0}, 2000, Phaser.Easing.Linear.None, true);
+      blackness.alpha = 0;
+      var fadingTween = this.game.add.tween(blackness).to({alpha: 1}, 2000, Phaser.Easing.Linear.None, true);
       fadingTween.onComplete.add(this.advanceToWinScreen, this);
     },
     advanceToWinScreen: function() {
