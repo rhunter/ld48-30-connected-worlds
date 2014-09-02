@@ -24,6 +24,7 @@ Preload.prototype = {
     this.load.image('sky', 'assets/space.png');
     this.load.image('landouter', 'assets/sectorouter.png');
     this.load.image('landsurface', 'assets/sectorcover.png');
+    this.load.spritesheet('cat', 'assets/megupets_fat_orange_cat_walk_sheet.png', 158, 206, 19);
     this.load.spritesheet('noisered', 'assets/noisered.png', 3, 2);
     this.load.spritesheet('noiseblue', 'assets/noiseblue.png', 3, 2);
     this.load.image('dudebutton', 'assets/dude.png');

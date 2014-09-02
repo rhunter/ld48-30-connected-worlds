@@ -55,7 +55,17 @@
     this.affiliation = options.affiliation;
     this.rallyFlag = options.rallyFlag;
     this.allowedWanderingRect = options.keepWithin;
-    Phaser.Sprite.call(this, game, x, y, 'dude' + this.affiliation);
+    Phaser.Sprite.call(this, game, x, y, 'cat');
+    this.scale.setTo(this.affiliation == 2 ? -0.15 : 0.15, 0.15);
+    var affiliationTints = {
+      1: 0xa080ff,
+      2: 0xffffff
+    }
+    this.normalTint = affiliationTints[this.affiliation];
+    this.tint = this.normalTint;
+    this.animations.add('walk');
+    this.animations.play('walk', 50, true);
+
 
     // this.timeSinceLastTurn = 0;
     // this.timeSinceLastMateSeen = 0;
@@ -111,6 +121,7 @@
   }
   WanderingDude.prototype.turnTowardDesire = function() {
     var newVelocity = Phaser.Point.subtract(this.desiredLocation, this.position).setMagnitude(25);
+    this.scale.x = Math.abs(this.scale.x) * Phaser.Math.sign(newVelocity.x);
     this.body.velocity.copyFrom(newVelocity);
   }
   WanderingDude.prototype.damage = function(amount) {
@@ -121,7 +132,7 @@
   }
   WanderingDude.prototype.flash = function() {
     var restoreTint = function() {
-      this.tint = 0xffffff;
+      this.tint = this.normalTint;
     }
     this.tint = 0xff8080;
 
