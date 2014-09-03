@@ -55,10 +55,14 @@
     this.affiliation = options.affiliation;
     this.rallyFlag = options.rallyFlag;
     this.allowedWanderingRect = options.keepWithin;
-    Phaser.Sprite.call(this, game, x, y, 'cat');
-    this.scale.setTo(this.affiliation == 2 ? -0.15 : 0.15, 0.15);
+    Phaser.Sprite.call(this, game, x, y, 'pet' + this.affiliation);
+    var affiliationScales = {
+      1: 0.2,
+      2: 0.15
+    }
+    this.scale.setTo(affiliationScales[this.affiliation], affiliationScales[this.affiliation]);
     var affiliationTints = {
-      1: 0xa080ff,
+      1: 0xffffff,
       2: 0xffffff
     }
     this.normalTint = affiliationTints[this.affiliation];
