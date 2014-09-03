@@ -97,6 +97,9 @@
     if(this.y > this.allowedWanderingRect.bottom) {
       this.body.velocity.y = -1 * Math.abs(this.body.velocity.y) * this.body.bounce.y;
     }
+
+    // face direction matchign current velocity
+    this.scale.x = Math.abs(this.scale.x) * Phaser.Math.sign(this.body.velocity.x);
   }
   WanderingDude.prototype.decideNextMove = function() {
     //if rally point flag is set, go there
@@ -121,7 +124,6 @@
   }
   WanderingDude.prototype.turnTowardDesire = function() {
     var newVelocity = Phaser.Point.subtract(this.desiredLocation, this.position).setMagnitude(25);
-    this.scale.x = Math.abs(this.scale.x) * Phaser.Math.sign(newVelocity.x);
     this.body.velocity.copyFrom(newVelocity);
   }
   WanderingDude.prototype.damage = function(amount) {
