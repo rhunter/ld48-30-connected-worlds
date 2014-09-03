@@ -272,6 +272,7 @@
       this.explosionEmitter = this.game.add.emitter(0,0, 100);
       this.explosionEmitter.makeParticles('noisered');
       this.explosionEmitter.gravity = 200;
+      this.land1.add(this.explosionEmitter);
 
       this.cursors = this.game.input.keyboard.createCursorKeys();
 
