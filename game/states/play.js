@@ -178,12 +178,12 @@
       this.buildingsGroup = this.game.add.group(this.land1);
       this.buildingsGroup.z = 2;
       this.dudeHouse = this.game.add.sprite(200, 240, 'hut1');
-      this.dudeHouse.anchor.setTo(0.5, 0.7)
+      this.dudeHouse.anchor.setTo(0.5, 0.8)
       this.dudeHouse.inputEnabled = true;
       this.dudeHouse.events.onInputDown.add(this.onSpawnButton, this);
 
       this.broHouse = this.game.add.sprite(700, 400, 'hut2');
-      this.broHouse.anchor.setTo(0.5, 0.5)
+      this.broHouse.anchor.setTo(0.5, 0.7)
       this.broHouse.inputEnabled = true;
       this.broHouse.events.onInputDown.add(this.spawnEnemy, this);
 
@@ -334,6 +334,7 @@
       var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1, rallyFlag: this.targetFlag, keepWithin: this.landSprite.getBounds()});
       dude.body.velocity.setTo(25, 25);
       this.dudesGroup.add(dude);
+      this.dudesGroup.sendToBack(dude);
       this.buttonSound.play();
     },
     onDudeKilled: function(dude) {
@@ -381,6 +382,7 @@
       sprite.body.velocity.setTo(-25, 25);
       sprite.events.onKilled.add(this.onDudeKilled, this);
       this.brosGroup.add(sprite);
+      this.brosGroup.sendToBack(sprite);
       this.buttonSound.play();
     },
     handleScrolling: function() {
