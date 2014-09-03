@@ -153,8 +153,8 @@
       this.numberOfAvailableBros = 30;
       this.game.world.setBounds(0,0,1024,768);
       this.cameraPresetForCloseness = {
-        true: new Phaser.Point(0,0),
-        false: new Phaser.Point(0,0)
+        true: new Phaser.Rectangle(0,0),
+        false: new Phaser.Rectangle(0,0)
       }
     },
     create: function() {
@@ -306,11 +306,9 @@
       this.music.stop();
     },
     onZoomButton: function() {
-      this.cameraPresetForCloseness[this.desireCloseness].copyFrom(this.camera);
+      this.cameraPresetForCloseness[this.desireCloseness].copyFrom(this.camera.view);
       this.desireCloseness = !this.desireCloseness;
-      // phaser doesn't seem to provide "set camera x/y from Point"
-      this.camera.x = this.cameraPresetForCloseness[this.desireCloseness].x;
-      this.camera.y = this.cameraPresetForCloseness[this.desireCloseness].y;
+      this.camera.view.copyFrom(this.cameraPresetForCloseness[this.desireCloseness]);
     },
     onFolksMeet: function(dude, bro) {
       dude.damage(20);
