@@ -1,5 +1,21 @@
 
   'use strict';
+
+//XXX: import from underscore or similar
+function once(fn, context) {
+  var result;
+
+  return function() {
+    if(fn) {
+      result = fn.apply(context || this, arguments);
+      fn = null;
+    }
+
+    return result;
+  };
+}
+
+
   // XXX: monkey patch
   // Phaser (in 2.0.7) doesn't scale bodies when their parent sprite is scaled indirectly (via a group)
 
@@ -326,6 +342,9 @@
       land2.hasMadeContactWithAnotherLand = true;
       this.game.add.tween(land1.body.velocity).to({x: 0, y: 0}, 2000, Phaser.Easing.Linear.None, true);
       this.game.add.tween(land2.body.velocity).to({x: 0, y: 0}, 2000, Phaser.Easing.Linear.None, true);
+      once(function() {
+      ga('send', {hitType: 'event', eventCategory: 'gameCondition', eventAction: 'landsCollide', eventLabel: 'lands collide'});
+      });
     },
     onSpawnButton: function() {
       if (this.numberOfAvailableDudes < 1) {
@@ -344,6 +363,9 @@
 
       this.explosionEmitter.at(dude);
       this.explosionEmitter.start(true, 300, null, 10)
+      once(function() {
+      ga('send', {hitType: 'event', eventCategory: 'gameCondition', eventAction: 'dudeKilled', eventLabel: 'a dude went splort'});
+      });
     },
     onTouchLand: function(land, pointer) {
       if (!this.desireCloseness) {
@@ -355,9 +377,13 @@
       // XXX: only works with unzoomed map
       var worldPositionTouched = Phaser.Point.add(this.game.camera, pointer.positionDown);
       this.plantFlagAt(worldPositionTouched);
+      once(function() {
+      ga('send', {hitType: 'event', eventCategory: 'interaction', eventAction: 'plantFlag', eventLabel: 'plant a flag'});
+      });
     },
     onTouchFlag: function(flag, pointer) {
       this.removeFlag();
+      ga('send', {hitType: 'event', eventCategory: 'interaction', eventAction: 'removeFlag'});
     },
     onWin: function() {
       var blackness = this.game.add.graphics(0,0);
@@ -368,6 +394,7 @@
       blackness.alpha = 0;
       var fadingTween = this.game.add.tween(blackness).to({alpha: 1}, 2000, Phaser.Easing.Linear.None, true);
       fadingTween.onComplete.add(this.advanceToWinScreen, this);
+      ga('send', {hitType: 'event', eventCategory: 'gameCondition', eventAction: 'win'});
     },
     advanceToWinScreen: function() {
       this.game.state.start('gameover');
@@ -385,6 +412,9 @@
       this.brosGroup.add(sprite);
       this.brosGroup.sendToBack(sprite);
       this.buttonSound.play();
+      once(function() {
+      ga('send', {hitType: 'event', eventCategory: 'interaction', eventAction: 'spawnEnemy', eventLabel: 'spawn an enemy'});
+      });
     },
     handleScrolling: function() {
       if (this.cursors.left.isDown) {
@@ -393,6 +423,9 @@
       if (this.cursors.right.isDown) {
         this.game.camera.x += 4
       }
+      once(function() {
+      ga('send', {hitType: 'event', eventCategory: 'interaction', eventAction: 'scroll', eventLabel: 'scroll with keys'});
+      });
     },
     showNumbers: function() {
       this.uiDudeCountLabel.visible = this.desireCloseness;
