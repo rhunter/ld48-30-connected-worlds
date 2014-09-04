@@ -88,7 +88,7 @@ function once(fn, context) {
 
 
     // this.timeSinceLastTurn = 0;
-    // this.timeSinceLastMateSeen = 0;
+    this.timeLastOnLand = 0;
       this.desiredLocation = new Phaser.Point();
       this.game.physics.arcade.enable(this);
       this.body.updateBounds = updateBoundsConsideringContainerScale;
@@ -104,6 +104,14 @@ function once(fn, context) {
   WanderingDude.prototype = Object.create(Phaser.Sprite.prototype);
   WanderingDude.prototype.constructor = WanderingDude;
   WanderingDude.prototype.update = function() {
+    if (this.game.time.elapsedSince(this.timeLastOnLand) > 50) {
+      this.bounceOffWalls();
+    }
+
+    // face direction matchign current velocity
+    this.scale.x = Math.abs(this.scale.x) * Phaser.Math.sign(this.body.velocity.x);
+  }
+  WanderingDude.prototype.bounceOffWalls = function() {
     if(this.x < this.allowedWanderingRect.left) {
       this.body.velocity.x = Math.abs(this.body.velocity.x) * this.body.bounce.x;
     }
@@ -117,9 +125,6 @@ function once(fn, context) {
     if(this.y > this.allowedWanderingRect.bottom) {
       this.body.velocity.y = -1 * Math.abs(this.body.velocity.y) * this.body.bounce.y;
     }
-
-    // face direction matchign current velocity
-    this.scale.x = Math.abs(this.scale.x) * Phaser.Math.sign(this.body.velocity.x);
   }
   WanderingDude.prototype.decideNextMove = function() {
     //if rally point flag is set, go there
@@ -303,6 +308,7 @@ function once(fn, context) {
       if (!this.landSprite.hasMadeContactWithAnotherLand) {
         this.game.physics.arcade.collide(this.land1, this.land2, this.onWorldsCollide, null, this);
       }
+      this.game.physics.arcade.overlap(this.dudesGroup, [this.land1, this.land2], this.onDudeOverlapsLand, null, this);
       this.handleScrolling();
       this.showCloseness();
       this.showNumbers();
@@ -346,13 +352,17 @@ function once(fn, context) {
       ga('send', {hitType: 'event', eventCategory: 'gameCondition', eventAction: 'landsCollide', eventLabel: 'lands collide'});
       });
     },
+    onDudeOverlapsLand: function(dude, land) {
+      dude.timeLastOnLand = this.game.time.now;
+      dude.allowedWanderingRect = land.getBounds(); // XXX: only works when camera is [0,0]! use land.world or land.body instead
+    },
     onSpawnButton: function() {
       if (this.numberOfAvailableDudes < 1) {
         this.deadButtonSound.play();
         return;
       }
       this.numberOfAvailableDudes--;
-      var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1, rallyFlag: this.targetFlag, keepWithin: this.landSprite.getBounds()});
+      var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1, rallyFlag: this.targetFlag, keepWithin: this.landSprite.getBounds()});  // XXX: only works when camera is [0,0]! use land.world or land.body instead
       dude.body.velocity.setTo(25, 25);
       this.dudesGroup.add(dude);
       this.buttonSound.play();
@@ -405,7 +415,7 @@ function once(fn, context) {
         return;
       }
       this.numberOfAvailableBros--;
-      var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2, rallyFlag: this.enemyFlag, keepWithin: this.landSprite.getBounds()});
+      var sprite = new WanderingDude(this.game, this.broHouse.x, this.broHouse.y, {affiliation: 2, rallyFlag: this.enemyFlag, keepWithin: this.landSprite.getBounds()});  // XXX: only works when camera is [0,0]! use land.world or land.body instead
       this.game.physics.arcade.enable(sprite);
       sprite.body.velocity.setTo(-25, 25);
       sprite.events.onKilled.add(this.onDudeKilled, this);
