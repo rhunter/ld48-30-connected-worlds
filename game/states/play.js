@@ -87,8 +87,8 @@ function once(fn, context) {
     this.animations.play('walk', 50, true);
 
 
-    // this.timeSinceLastTurn = 0;
-    this.timeLastOnLand = 0;
+    this.timeLastDecidedWhereToGo = game.time.now;
+    this.timeLastOnLand = game.time.now;
       this.desiredLocation = new Phaser.Point();
       this.game.physics.arcade.enable(this);
       this.body.updateBounds = updateBoundsConsideringContainerScale;
@@ -97,34 +97,20 @@ function once(fn, context) {
       this.body.collideWorldBounds = false;
       this.body.bounce.set(1.0);
 
-      var when = this.game.rnd.between(3,8);
-
-      this.game.time.events.add(Phaser.Timer.SECOND * when, this.decideNextMove, this);
+      this.maxDelayBetweenDecisions = Phaser.Timer.SECOND * this.game.rnd.between(3,8);
   }
   WanderingDude.prototype = Object.create(Phaser.Sprite.prototype);
   WanderingDude.prototype.constructor = WanderingDude;
   WanderingDude.prototype.update = function() {
     if (this.game.time.elapsedSince(this.timeLastOnLand) > 50) {
-      this.bounceOffWalls();
+      this.decideNextMove();
+    }
+    if (this.game.time.elapsedSince(this.timeLastDecidedWhereToGo) > this.maxDelayBetweenDecisions) {
+      this.decideNextMove();
     }
 
     // face direction matchign current velocity
     this.scale.x = Math.abs(this.scale.x) * Phaser.Math.sign(this.body.velocity.x);
-  }
-  WanderingDude.prototype.bounceOffWalls = function() {
-    if(this.x < this.allowedWanderingRect.left) {
-      this.body.velocity.x = Math.abs(this.body.velocity.x) * this.body.bounce.x;
-    }
-    if(this.x > this.allowedWanderingRect.right) {
-      this.body.velocity.x = -1 * Math.abs(this.body.velocity.x) * this.body.bounce.x;
-    }
-
-    if(this.y < this.allowedWanderingRect.top) {
-      this.body.velocity.y = Math.abs(this.body.velocity.y) * this.body.bounce.y;
-    }
-    if(this.y > this.allowedWanderingRect.bottom) {
-      this.body.velocity.y = -1 * Math.abs(this.body.velocity.y) * this.body.bounce.y;
-    }
   }
   WanderingDude.prototype.decideNextMove = function() {
     //if rally point flag is set, go there
@@ -139,9 +125,9 @@ function once(fn, context) {
       this.aimForWherever();
     }
 
-    this.turnTowardDesire();
+    this.timeLastDecidedWhereToGo = this.game.time.now;
 
-    this.game.time.events.add(Phaser.Timer.SECOND * this.game.rnd.between(3,8), this.decideNextMove, this);
+    this.turnTowardDesire();
   };
   WanderingDude.prototype.aimForWherever = function() {
     this.desiredLocation.x = this.game.rnd.between(0,800);
@@ -309,6 +295,7 @@ function once(fn, context) {
         this.game.physics.arcade.collide(this.land1, this.land2, this.onWorldsCollide, null, this);
       }
       this.game.physics.arcade.overlap(this.dudesGroup, [this.land1, this.land2], this.onDudeOverlapsLand, null, this);
+      this.game.physics.arcade.overlap(this.brosGroup, [this.land1, this.land2], this.onDudeOverlapsLand, null, this);
       this.handleScrolling();
       this.showCloseness();
       this.showNumbers();
