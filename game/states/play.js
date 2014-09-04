@@ -291,6 +291,8 @@
       this.showCloseness();
       this.showNumbers();
       this.maybeWin();
+      this.dudesGroup.sort('y', Phaser.Group.SORT_ASCENDING);
+      this.brosGroup.sort('y', Phaser.Group.SORT_ASCENDING);
       if(this.hasPlayerAchievedVictory) {
         this.game.time.events.add(Phaser.Timer.SECOND * 4, this.onWin, this);
       }
@@ -334,7 +336,6 @@
       var dude = new WanderingDude(this.game, this.dudeHouse.x, this.dudeHouse.y, {affiliation: 1, rallyFlag: this.targetFlag, keepWithin: this.landSprite.getBounds()});
       dude.body.velocity.setTo(25, 25);
       this.dudesGroup.add(dude);
-      this.dudesGroup.sendToBack(dude);
       this.buttonSound.play();
     },
     onDudeKilled: function(dude) {
